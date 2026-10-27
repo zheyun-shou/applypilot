@@ -1,221 +1,109 @@
 # ApplyPilot
 
-**English** · [中文](README.zh-CN.md)
+A job search workflow for AI agents such as Claude Code and Codex.
 
-Turn scattered job applications into an agent-led workflow.
+ApplyPilot has two parts.
 
-ApplyPilot is a reusable job application workflow for Codex and other AI agents.
+- **The skill** (`SKILL.md`, `references/`, `templates/`) tells an agent how to run a job search with you. It covers your profile, screening rules, resume choice, filling forms safely and recording every outcome.
+- **The pipeline** (`pipeline/`) does the repetitive work. It collects new ads every day, closes the ones that cannot work for you and gives each one a reason, keeps every ad in one pool, builds an apply board you tick, and can fill application forms from your profile.
 
-ApplyPilot turns job searching into a repeatable operating system: candidate profile, dashboard, screening rules, resume strategy, application execution, blocker triage, and follow-up.
+You can use the skill alone. The pipeline is optional, and it is the part that saves the most time.
 
-## Agent-Assisted Install
+## What the pipeline adds
 
-If you want your coding agent to install and start ApplyPilot for you, send it this repo and say:
+- **Daily sweeps.** It collects new ads from LinkedIn's public job search, which needs no login, and from Platsbanken for Sweden. A missed run is covered by the next one, because the window widens to fill the gap. It warns you when a keyword returns only padding or hits LinkedIn's 100-ad limit.
+- **Screening by rule, with a reason for every ad it closes.** It closes ads only for things you cannot change. That means a language you do not work in, a refusal to sponsor in a country where you need sponsorship, a security clearance, a years bar above your level, or gig work. Your field and limits go in config files. How ads phrase these things is handled in code and covered by tests.
+- **One job pool.** Every ad it has seen is in `job_pool.csv` with a status and a reason, so nothing is screened twice and nothing gets lost.
+- **Reading in batches.** The ads that pass are shown to you or your agent as short digests of requirements, years and visa signals, 30 at a time. You rank each one High, Medium or Low, or skip it.
+- **An apply board.** One HTML page lists the open jobs by priority, with deadlines and the jobs that need you at the top. You tick a job when you apply and remove one that is not a fit, and those changes go back into the pool. It works as a local file. It can also be a claude.ai Artifact that saves your ticks, so your agent can read them later.
+- **Form runners (optional).** Node scripts fill LinkedIn Easy Apply and company-site forms using only `profile.json`. Sponsorship answers follow the job's country. A dry run is the default. They stop on any question your profile does not answer. With `--submit` they submit only when every question was known.
+- **A UK sponsor check.** It can match employers against the UK register of licensed sponsors.
+- **A guide for agents.** [pipeline/AGENT_GUIDE.md](pipeline/AGENT_GUIDE.md) gives the rules an agent follows when it runs your search. It never invents a fact about you. It stops on personal free-text questions. It never logs in for you. It counts a submission only when there is evidence.
 
-```text
-Clone https://github.com/yvonnehe772/applypilot and use ApplyPilot to initialize my job search workflow.
-```
+## Your data stays on your computer
 
-## What This Is
+Everything personal goes in a `workspace/` folder. That includes your profile, CV path, job pool, board, browser logins and run logs. The folder is in `.gitignore`, so it is never committed. The repository holds only code, templates and a fake example person.
 
-ApplyPilot is not a magic one-click job bot. It is a structured workflow that helps an AI agent:
-
-- Understand the candidate before taking action.
-- Track every job lead and application outcome.
-- Decide what is worth applying to and what should be skipped.
-- Choose the right resume strategy for precision or volume.
-- Handle common browser and ATS issues more consistently.
-- Stop safely when human input is required.
+Connectors such as Gmail belong to your own agent account, not to this repository. Someone who clones the repository gets none of your data, memory or email.
 
 ## Install
 
-Recommended:
+Clone the repository:
 
 ```bash
-git clone https://github.com/yvonnehe772/applypilot.git ~/.codex/skills/applypilot
+git clone https://github.com/zheyun-shou/applypilot.git
 ```
 
-If you downloaded the repo manually, you can also copy the folder:
+To use it as a skill, put it in your agent's skills folder.
 
 ```bash
-mkdir -p ~/.codex/skills
-cp -R applypilot ~/.codex/skills/applypilot
+# Claude Code
+git clone https://github.com/zheyun-shou/applypilot.git ~/.claude/skills/applypilot
+
+# Codex
+git clone https://github.com/zheyun-shou/applypilot.git ~/.codex/skills/applypilot
 ```
 
-Then start a new Codex thread and say:
+Then open a new session and say:
 
 ```text
-Use $applypilot to set up my job search workflow.
+Use the applypilot skill to set up my job search. Start with a trial that only finds and sorts jobs and does not apply to anything.
 ```
 
-ApplyPilot setup is agent-led. You should not need to read every reference file or fill every template manually. The agent should ask the minimum questions needed to start safely, draft the files for you, run a small trial, then improve the workflow from real blockers.
+To update, run `git pull` in that folder.
 
-For first-time users, the first trial should be lead finding only: find 3-5 jobs, classify them, update the dashboard, and do not submit applications.
+## Quick start for the pipeline
 
-First-time onboarding should be short, usually 8-10 minutes. ApplyPilot should collect the minimum safe setup first and defer detailed answer-bank, self-ID, follow-up, and resume-tailoring details until they matter.
-
-## Update
-
-ApplyPilot does not update automatically after installation.
-
-If you installed with `git clone`, update with:
+The sweep, screening, pool and board need only Python 3.8 or newer. The form runners also need Node.js 18 or newer and Chrome.
 
 ```bash
-cd ~/.codex/skills/applypilot
-git pull
+cd applypilot
+python pipeline/ap.py init                    # creates ./workspace with example config
+# fill in workspace/config/profile.json, search.json, screening.json
+python pipeline/ap.py doctor                  # says what is missing
+python pipeline/ap.py sweep --region sweden   # collect and screen
+python pipeline/ap.py ingest                  # add the results to the pool
+python pipeline/ap.py read --batch 1          # read the ads that passed
+python pipeline/ap.py board build             # writes workspace/dashboard/apply_board.html
 ```
 
-If you copied the folder manually, replace your local `~/.codex/skills/applypilot` folder with the latest version from GitHub.
+Or ask your agent to run it for you: "Read pipeline/AGENT_GUIDE.md and set up the ApplyPilot pipeline for me." It will ask you about ten minutes of questions and fill the config files itself.
 
-## Start Prompts
+Full commands, config fields, scheduling and troubleshooting are in [pipeline/README.md](pipeline/README.md).
 
-Copy one of these into Codex:
+## How the skill works
 
-```text
-Use $applypilot to initialize my job search workflow.
-```
+Setup builds five things from `templates/`. The agent drafts them by asking you questions, so you do not fill them by hand.
 
-```text
-Use $applypilot. I want volume mode: help me set up stable resume routing, application rules, and a dashboard before applying.
-```
+- **Candidate profile.** Facts the agent must never guess, such as your identity, contact details, work authorization, target roles, location and salary.
+- **Application rules.** What to prioritise, what to skip, and what to hand back to you.
+- **Resume routing.** Which CV to use for which kind of role.
+- **Answer bank.** True, reusable answers to common form questions.
+- **Dashboard.** CSV sheets for jobs, applications, blockers and follow-ups.
 
-```text
-Use $applypilot. I want precision mode: help me evaluate fit, tailor my resume draft, and ask for my review before submitting high-value applications.
-```
+Every job gets a status.
 
-```text
-Use $applypilot. I am not sure which mode to use; start me in Volume mode and tell me when a role should be promoted to Precision.
-```
+- `Pending` means worth a look or an application later.
+- `Needs user` means a fact or action only you can give, such as sponsorship, salary, a login or a personal answer.
+- `Skipped` means not worth applying under your rules, with the reason recorded.
+- `Submitted` means sent, with evidence such as a confirmation page or email.
 
-## Quick Start: First Safe Run
+There are two resume modes. **Volume** is the default. It uses a few fixed CV versions and short forms. **Precision** is for a role you care about. It tailors the CV from an editable source, such as DOCX, Markdown or plain text, and you review it before anything is sent.
 
-For a first run, do not start with auto-apply. Ask ApplyPilot to do a lead-finding-only trial:
+[examples/fake-demo-example](examples/fake-demo-example) shows a complete setup for a person who does not exist.
 
-```text
-Use $applypilot to initialize my workflow, then run a lead-finding-only trial: find 3-5 jobs, classify them, update the dashboard, and do not open application flows or submit anything.
-```
+## Safety rules
 
-ApplyPilot works in two stages:
+ApplyPilot never:
 
-- Lead finding: decide whether a job is worth tracking, skipping, or asking the user about.
-- Application execution: only after the profile, resume, work authorization, sponsorship, compensation, and account/session facts are safe enough.
+- guesses legal, identity, work authorization, salary or employment facts;
+- makes up experience, credentials or documents;
+- gets past CAPTCHA, Cloudflare or other bot checks, or logs in through an account or 2FA it does not know;
+- counts a saved job or an autofill badge as an application;
+- publishes CVs, contact details, immigration documents, application history, cookies or one-time codes.
 
-Status basics:
+A dry run is the default. Nothing is submitted until you allow it. LinkedIn's user agreement does not allow automated use, so the Easy Apply runner puts your account at some risk. The sweep reads only public pages. Some application systems, Ashby for example, flag automated browsers as spam. For those, do the dry run with the runner and press submit yourself.
 
-- `Pending`: worth later review or application.
-- `Needs user`: a missing user-owned fact or action blocks the decision, such as sponsorship, work authorization, compensation, login, upload, or sensitive answers.
-- `Skipped`: clearly not worth applying under the user's rules.
-- `Blocked`: the workflow or site interaction could not safely proceed.
+## Status
 
-## First-Time Setup
-
-Start by filling or generating these files from the templates in `templates/`:
-
-- Candidate profile: identity, contact, work authorization, target roles, location, compensation, and non-guessable facts.
-- Application rules: what to prioritize, consider, skip, or hand off.
-- Resume routing: which resume to use for which role family.
-- Answer bank: reusable truthful answers for common application questions.
-- Dashboard: CSV sheets for job pool, application log, blockers, follow-up, resume rules, and automation lessons.
-
-Minimum viable setup is enough for the first run. You can add detailed answer-bank wording, follow-up rules, and ATS-specific lessons after you see where the workflow gets stuck.
-
-The safest first trial is `Lead finding only`. It should produce dashboard rows such as `Pending`, `Skipped`, `Needs user`, and `Blocked` without opening real application flows.
-
-中文使用方式：
-
-1. 先建立 candidate profile，不要让 AI 猜身份、签证、薪资、当前状态。
-2. 再建立 dashboard，让每个岗位都有状态和记录。
-3. 写清楚岗位筛选规则，尤其是“不投什么”。
-4. 选择简历策略：默认海投；高价值岗位可以升级为精投。
-5. 遇到卡点后，把问题沉淀成新的规则。
-
-## Core Modules
-
-ApplyPilot follows four setup modules:
-
-- Candidate Profile: the user's source of truth.
-- Dashboard: the system memory for all actions and outcomes.
-- Screening Rules: priority, skip, level, location, sponsorship, and freshness rules.
-- Resume Strategy: Volume by default, with selected high-fit roles promoted to Precision.
-
-It also includes a practical browser and ATS playbook for permissions, dropdowns, address matching, Simplify overlays, tab cleanup, confirmation checks, Gmail verification, CAPTCHA/Cloudflare boundaries, login sessions, resume upload verification, and Goal-mode expectations.
-
-Candidate Profile and Answer Bank are intentionally separate. Candidate Profile stores the user's facts and constraints; Answer Bank stores reusable wording for repeated application questions. The user can provide answers directly, or the agent can draft a first version from the profile and ask the user to confirm it once.
-
-Resume strategy is chosen during setup. If the user is unsure, start with Volume: use stable resume variants, low-friction applications, and fewer interruptions. A specific high-fit or high-value role can be promoted to Precision. Precision can justify Workday, Oracle, long forms, or deeper custom work when the user confirms the role is worth it. External fit scores from tools like Jobright or Simplify can be used when available, but ApplyPilot can also estimate qualitative fit from title, level, skills, domain, location, authorization, and candidate story coherence.
-
-For resume tailoring, users should provide an editable source when possible: DOCX, Markdown, Google Docs export, or plain text. PDF is fine for submitting applications and reviewing fit, but PDF-only is not ideal for precise resume edits. If the user only has a PDF, ApplyPilot should first help create an editable draft before tailoring.
-
-Precision mode is a guided workflow, especially for first-time users. The agent should start with review-only or draft changes, create a new tailored version from an editable source, and ask the user to review it before submitting high-value applications. Once the user trusts the output, they can loosen review rules.
-
-## Automated Pipeline
-
-The [`pipeline/`](pipeline/) folder adds scripts for the repetitive part of the work:
-
-- daily sweeps of LinkedIn's public job search, plus Platsbanken for Sweden;
-- rule-based screening that records a reason for every ad it closes;
-- a job pool with a reading pass for the ads that survive;
-- an apply board you can tick, published as a claude.ai Artifact or opened as a local file;
-- optional browser runners that fill LinkedIn Easy Apply and company-site forms from your profile and stop on any question they cannot answer.
-
-The pipeline needs only Python 3.8+. The apply runners also need Node.js and Chrome. Start with [pipeline/README.md](pipeline/README.md). If an agent runs it for you, point the agent at [pipeline/AGENT_GUIDE.md](pipeline/AGENT_GUIDE.md).
-
-## Tool Capability Matrix
-
-ApplyPilot adapts to the tools available in the user's agent environment.
-
-| Capability | What ApplyPilot can do |
-|---|---|
-| No browser tools | Screen jobs from provided links, create rules, route resumes, draft answers, update dashboard files. |
-| Browser automation | Search jobs, fill normal forms, upload resumes, close tabs, and record outcomes. |
-| Visual/computer use | Handle custom dropdowns, covered buttons, visual upload checks, and pages where DOM state disagrees with visible state. |
-| Email tool | Retrieve security codes only when the user has connected email and explicitly authorized it. |
-| Never automated | CAPTCHA, Cloudflare, unknown login/2FA, payment prompts, sensitive legal uncertainty, or missing materials. |
-
-Fast browser automation is preferred for batch work. Visual or computer-use control is a fallback for fragile pages, not the default.
-
-## Safety Boundaries
-
-ApplyPilot should never:
-
-- Guess legal, identity, work authorization, compensation, or employment facts.
-- Bypass CAPTCHA, Cloudflare, or anti-bot checks.
-- Auto-login through unknown accounts or 2FA.
-- Fabricate experience, credentials, portfolio work, references, or documents.
-- Count saved jobs, trackers, or autofill badges as submitted applications.
-- Auto-fill work authorization, sponsorship, compensation, voluntary self-ID, background check, or legal answers when they are missing or ambiguous.
-- Publish private resumes, phone numbers, emails, addresses, immigration documents, application history, browser sessions, cookies, OTPs, or personal records.
-
-Default apply behavior:
-
-- Fill clear basic fields from the profile.
-- Ask focused questions for missing high-impact facts.
-- During onboarding, ask for voluntary self-ID strategy. If the user does not choose, default to blank, decline, or "Prefer not to say" when allowed, and tell the user that is the default.
-- Draft custom answers from answer-bank patterns and ask before first use.
-- Always stop before final submit.
-
-For the first real application test, LinkedIn Easy Apply is usually the safest path because it is shorter and has clearer confirmation. Greenhouse is useful for ATS testing because it exposes EEO, email security code, upload, and dropdown behavior.
-
-## Recommended Prompt
-
-```text
-Use $applypilot. Help me initialize my candidate profile, dashboard, application rules, resume routing, and answer bank before applying to jobs.
-```
-
-## Example Gallery
-
-See [examples/fake-demo-example](examples/fake-demo-example) for a complete fake demo. It shows what a filled setup can look like:
-
-- Candidate profile.
-- Application rules.
-- Resume routing.
-- Answer bank.
-- Dashboard rows for `Submitted`, `Blocked`, `Skipped`, `Needs user`, and `Pending`.
-
-The example is not a real person and should not be copied directly. Use it to understand what information to give the agent and what files ApplyPilot can generate.
-
-## Project Status
-
-This is the first public version of a personal Codex job-search workflow, rewritten as a reusable skill for other agents and job seekers. It is meant to be adapted to your own background, market, and application style.
-
-Suggestions, issues, and improvements are welcome.
+The skill comes from [yvonnehe772/applypilot](https://github.com/yvonnehe772/applypilot) by Yvonne He. This repository adds the pipeline. The screening examples are tuned for ML, AI and data roles in Europe. Change `screening.json` for your own field. Issues and suggestions are welcome.
