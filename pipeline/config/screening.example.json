@@ -1,0 +1,61 @@
+{
+  "_about": "Automatic closing rules. Keys starting with _ are comments. Every value here is also the default when your workspace copy leaves a key out. The example is tuned for entry-level machine learning, AI and data roles: change the title, research and content patterns for your own field. Patterns are case-insensitive Python regular expressions.",
+
+  "title": {
+    "_about": "Decides which ads get their full text fetched. Wide on purpose: a vague title can hide a good job, and only the body tells.",
+    "exclude": "\\b(senior|sr\\.?|lead|head|principal|staff|manager|chef|director|vp|expert|professor|postdoc|postdoktor|doktorand|phd student|examensarbete|thesis|sales|account|recruit|talent|marketing|technician|tekniker|mont|installat|elektriker|mechanic|driver|s(ä|a)ljare|architect)\\b",
+    "include": "\\b(engineer|engineering|developer|utvecklare|ingenj|scientist|researcher|analyst|analytiker|konsult|consultant|data|ml|ai|machine learning|analytics|vision|specialist)\\b",
+    "_include_stems": "Matched with no word boundary, for languages that build compounds (Swedish Dataingenjör, Dataanalytiker).",
+    "include_stems": "(ingenj|utvecklare|analytiker|vetare|dataanalys|datakonsult|analyskonsult)",
+    "_family": "A title in your core family passes the content check on its own, even when the ad body is all company prose.",
+    "family": "\\bai[- ]?(engineer|developer|utvecklare|specialist|scientist)|\\bml\\b|machine learning|data (engineer|scien|analy)|analytics engineer|dataanalytiker|data ?ingenj|applied ai|forward deployed|mlops|deep learning|computer vision|agent developer"
+  },
+
+  "research": {
+    "_about": "PhD, postdoc and research posts are judged on topic, not on title words. Set enabled to false to close them all.",
+    "enabled": true,
+    "topics": "(time.?series|tidsserie|signal|sensor|telemetry|computer vision|datorseende|imaging|bildanalys|image analysis|biosignal|eeg|ecg|physiological|predictive maintenance|condition monitoring|anomaly detection|fault detection|speech|audio|acoustic|robot|control|autonom|digital twin|avbildning|bildbehandling|signalbehandl|akustis|maskinseende)",
+    "_method_words": "A research title naming only a method (machine learning, AI) also passes to a human read. Leave empty to require a topic.",
+    "method_words": "(machine learning|maskininl|deep learning|artificial intelligence|artificiell intelligens|reinforcement learning|\\bAI\\b|\\bML\\b)"
+  },
+
+  "graduate_programmes": {
+    "_about": "Graduate, trainee and early-career programme titles go to the body read whatever their track, except tracks that are plainly another profession.",
+    "enabled": true,
+    "other_tracks": "legal|\\blaw\\b|jurist|nurs|\\btax\\b|sales|vertrieb|human resources|\\bhr\\b|\\bpeople\\b|butik|store|senior|manager|management trainee|marketing|account|recruit|technician|mechanic|driver|architect|teacher|therap|clinical|pharmac|doctor|psycholo|estate agent|surveyor|accountant|audit|financial advis|business development|coordinator"
+  },
+
+  "internships": {
+    "_about": "Policy values: all, conversion_or_paid, conversion_only, none. 'where_authorized' applies in countries where your profile says you can already work; 'where_sponsorship_needed' applies elsewhere.",
+    "where_authorized": "all",
+    "where_sponsorship_needed": "conversion_or_paid",
+    "close_if_enrolment_required": true
+  },
+
+  "content": {
+    "_about": "An ad survives the content check when its body shows ONE signal from your field, or analytics_min different analytics words, or its title matches title.family. Set analytics_min to 0 to switch the analytics rescue off.",
+    "signals": "(machine learning|deep learning|neural network|data scien|pytorch|tensorflow|scikit|signal processing|time.series|sensor fusion|computer vision|predictive model|image analysis|statistical model|data pipeline|data engineer|maskininlärning|mlops|feature engineering|\\bllms?\\b|large language model|generative ai|generativ ai|\\bgenai\\b|\\brag\\b|retrieval.augmented|agentic|ai agents?|langchain|langgraph|fine.tun|embeddings?|vector (database|store|search)|\\bnlp\\b|natural language processing|transformer model|språkmodell|neurala n(a|ä)tverk|djupinl(a|ä)rning|datorseende|bildanalys|bildbehandling|signalbehandling|tidsserie|sensordata|prediktiva? modell|maskinl(a|ä)rning)",
+    "analytics_signals": "(\\bsql\\b|power ?bi|tableau|looker|qlik|dashboard|\\bkpi\\b|nyckeltal|reporting|rapportering|forecast|prognos|segmentation|cohort|a/b test|hypothesis|regression|statistic|statistik|data.driven|datadriven|insight|visuali[sz]|analytics|analys)",
+    "analytics_min": 3
+  },
+
+  "years": {
+    "_about": "Ads that ask for MORE than this many years are closed. Bars of 1-2 years usually bend; 3+ rarely do.",
+    "max_years_ok": 2
+  },
+
+  "languages": {
+    "_about": "Languages you cannot work in. An ad closes only when it REQUIRES one of them; the language an ad is written in, or 'X is a plus', does not close it. Known: swedish, german, danish, norwegian, finnish, dutch, french (french is the least tested).",
+    "cannot_work_in": ["swedish", "german", "danish", "norwegian", "finnish", "dutch"],
+    "_knowledge_is_enough": "Languages you read but do not speak: 'knowledge of Swedish' stays open, 'fluent' or 'speak Swedish' closes.",
+    "knowledge_is_enough": []
+  },
+
+  "other": {
+    "close_gig_work": true,
+    "_close_senior_prose": "Closes ads that say 'extensive experience', 'seasoned' and similar without a number. The reason says so, so you can re-open them.",
+    "close_senior_prose": true,
+    "_close_clearance_or_citizenship": "Set false if you hold the citizenship or clearance these ads ask for.",
+    "close_clearance_or_citizenship": true
+  }
+}

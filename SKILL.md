@@ -82,6 +82,10 @@ For a first trial or demo run, default to lead finding only: find, screen, class
 
 After each run, summarize blockers and convert repeated issues into rules. ApplyPilot should improve through use: address matching, dropdown handling, resume upload checks, account/session checks, and ATS-specific lessons belong in the dashboard and rules.
 
+### 7. Run the Pipeline (optional)
+
+If the user wants daily automated sweeps, rule-based screening, an apply board or form-filling runners, read `pipeline/AGENT_GUIDE.md` and follow it. It covers setup, the per-round loop, how to judge ads, and the apply rules. Commands are in `pipeline/README.md`. Personal data stays in the workspace folder (`workspace/` by default), never in the repo.
+
 ## Safety
 
 Read `references/safety-and-boundaries.md` when the user asks about automation limits, CAPTCHA, email verification, account login, privacy, public sharing, or what should not be included in a repo.

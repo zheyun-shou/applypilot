@@ -175,6 +175,18 @@ Precision mode 第一版建议当作半自动流程：
 
 用户信任输出以后，可以逐步放宽确认规则。但不要一开始就让 agent 自动改简历、自动提交高价值岗位。
 
+## 自动化流水线
+
+[`pipeline/`](pipeline/) 目录把重复的部分做成了脚本：
+
+- 每天扫一次 LinkedIn 公开职位搜索，瑞典另外扫 Platsbanken；
+- 按规则自动关掉不合适的广告，每一条都写明原因；
+- 把岗位存进岗位池，留下来的岗位分批读；
+- 生成一个投递打勾板，可以发布成 claude.ai Artifact，也可以当本地网页打开；
+- 可选的浏览器脚本，按你的 profile 填 LinkedIn Easy Apply 和公司官网表单，遇到不会答的题就停。
+
+只需要 Python 3.8 以上。投递脚本另外需要 Node.js 和 Chrome。先看 [pipeline/README.md](pipeline/README.md)，让 agent 来跑的话，把 [pipeline/AGENT_GUIDE.md](pipeline/AGENT_GUIDE.md) 给它。
+
 ## 工具能力边界
 
 不同 agent 环境能做的事情不一样：

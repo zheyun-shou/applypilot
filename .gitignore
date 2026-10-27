@@ -1,0 +1,9 @@
+# Personal data lives in the workspace; never commit it.
+workspace/
+/workspace*/
+
+# Tooling
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/

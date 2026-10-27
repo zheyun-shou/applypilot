@@ -1,0 +1,17 @@
+{
+  "name": "applypilot-apply",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser runners that fill job application forms from profile.json and stop on any unknown question.",
+  "scripts": {
+    "login": "node login.mjs",
+    "easyapply": "node easyapply.mjs",
+    "site": "node site_fill.mjs",
+    "inspect": "node inspect.mjs",
+    "test": "node test_answers.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.48.2"
+  }
+}

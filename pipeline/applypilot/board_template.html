@@ -1,0 +1,508 @@
+<title>Apply board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<style id="css">
+  :root{
+    --ground:#F6F8F9; --surface:#FFFFFF; --sunk:#EDF1F3;
+    --ink:#121A1E; --ink-2:#3D4C55; --muted:#6B7A85;
+    --line:#DCE4E8; --line-2:#C6D2D8;
+    --accent:#0E6B6B; --accent-soft:#DCEFEE;
+    --urgent:#A93E1B; --urgent-soft:#FAE6DE;
+    --warn:#8A5D0C; --warn-soft:#F8EDD6;
+    --done:#4B7A2E; --done-soft:#E7F0DE;
+    --shadow:0 1px 2px rgba(18,26,30,.06), 0 6px 20px rgba(18,26,30,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D1215; --surface:#161E22; --sunk:#111A1D;
+      --ink:#E7EFF2; --ink-2:#B3C2CA; --muted:#87969F;
+      --line:#26333A; --line-2:#34444C;
+      --accent:#46B3AA; --accent-soft:#12312F;
+      --urgent:#E4794F; --urgent-soft:#3A1F14;
+      --warn:#D8A544; --warn-soft:#332715;
+      --done:#8CC163; --done-soft:#1B2A14;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D1215; --surface:#161E22; --sunk:#111A1D;
+    --ink:#E7EFF2; --ink-2:#B3C2CA; --muted:#87969F;
+    --line:#26333A; --line-2:#34444C;
+    --accent:#46B3AA; --accent-soft:#12312F;
+    --urgent:#E4794F; --urgent-soft:#3A1F14;
+    --warn:#D8A544; --warn-soft:#332715;
+    --done:#8CC163; --done-soft:#1B2A14;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--ground); color:var(--ink);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:16px; line-height:1.55; -webkit-text-size-adjust:100%}
+  .wrap{max-width:900px; margin:0 auto; padding:26px 16px 120px; display:flex; flex-direction:column; gap:24px}
+  h1,h2{font-family:"IBM Plex Serif",Georgia,serif; margin:0; line-height:1.25; text-wrap:balance}
+  h1{font-size:clamp(1.55rem,5vw,2rem); font-weight:600; letter-spacing:-.01em}
+  h2{font-size:1.1rem; font-weight:600}
+  p{margin:0}
+  a{color:inherit; text-decoration:underline; text-decoration-color:var(--accent);
+    text-underline-offset:3px; text-decoration-thickness:1.5px}
+  a:hover{color:var(--accent)}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+  .eyebrow{font-family:"IBM Plex Mono",monospace; font-size:.68rem; font-weight:500;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+
+  header{display:flex; flex-direction:column; gap:9px; padding-bottom:14px; border-bottom:1px solid var(--line)}
+  .lede{color:var(--ink-2); font-size:.92rem}
+  .bar{height:7px; border-radius:99px; background:var(--sunk); overflow:hidden; margin-top:4px}
+  .bar > i{display:block; height:100%; background:var(--done); border-radius:99px; transition:width .35s ease}
+  .count{font-family:"IBM Plex Mono",monospace; font-size:.8rem; color:var(--muted);
+    font-variant-numeric:tabular-nums; display:flex; justify-content:space-between; gap:12px}
+  .count b{color:var(--ink); font-weight:600}
+
+  section{display:flex; flex-direction:column; gap:10px}
+  ul.list{list-style:none; margin:0; padding:0; background:var(--surface);
+    border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow); overflow:hidden}
+  ul.list li{display:flex; align-items:flex-start; gap:0}
+  ul.list li + li{border-top:1px solid var(--line)}
+  ul.list input[type=checkbox]{
+    appearance:none; -webkit-appearance:none; flex:none; margin:14px 0 0 14px;
+    width:19px; height:19px; border:1.5px solid var(--line-2); border-radius:5px;
+    background:var(--surface); cursor:pointer; position:relative; transition:.12s}
+  ul.list input[type=checkbox]:hover{border-color:var(--accent)}
+  ul.list input[type=checkbox]:checked{background:var(--done); border-color:var(--done)}
+  ul.list input[type=checkbox]:checked::after{content:""; position:absolute; left:5.5px; top:1.5px;
+    width:5px; height:10px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(43deg)}
+  ul.list input[type=checkbox]:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  ul.list label{flex:1; min-width:0; padding:11px 14px 11px 11px; cursor:pointer;
+    display:flex; flex-direction:column; gap:3px}
+  .t{font-weight:500; font-size:.95rem}
+  .m{display:flex; flex-wrap:wrap; gap:5px 8px; align-items:center; font-size:.76rem}
+  .m > span{color:var(--muted)}
+  .pri{font-family:"IBM Plex Mono",monospace; font-size:.63rem; font-weight:600; letter-spacing:.05em;
+    padding:1px 6px; border-radius:4px; background:var(--sunk)}
+  .p-high{background:var(--accent-soft); color:var(--accent)}
+  .dl{font-family:"IBM Plex Mono",monospace; font-weight:600; padding:1px 6px; border-radius:4px;
+    background:var(--warn-soft); color:var(--warn); font-variant-numeric:tabular-nums}
+  .dl.hot{background:var(--urgent-soft); color:var(--urgent)}
+  /* submitted-on date: same weight as a deadline chip, opposite meaning, so it reads green */
+  .sub{font-family:"IBM Plex Mono",monospace; font-weight:600; padding:1px 6px; border-radius:4px;
+    background:var(--done-soft); color:var(--done); font-variant-numeric:tabular-nums}
+  .why{font-style:italic}
+
+  /* remove control. Sits OUTSIDE the <label> on purpose: inside it, a click
+     would also toggle the checkbox the label is bound to. */
+  button.x{flex:none; align-self:center; margin:0 10px 0 0; padding:4px 8px;
+    font:inherit; font-size:.9rem; line-height:1; color:var(--muted);
+    background:none; border:1px solid transparent; border-radius:6px; cursor:pointer}
+  button.x:hover{color:var(--urgent); background:var(--urgent-soft); border-color:var(--urgent-soft)}
+  button.x:focus-visible{outline:2px solid var(--urgent); outline-offset:1px}
+  ul.list li.gone label{opacity:.5}
+  ul.list li.gone .t{text-decoration:line-through; text-decoration-thickness:1.5px}
+  .rwhy{width:100%; margin-top:5px; padding:5px 8px; font:inherit; font-size:.8rem;
+    color:var(--ink); background:var(--surface); border:1px solid var(--line);
+    border-radius:6px}
+  .rwhy:focus{outline:2px solid var(--accent); outline-offset:1px}
+  button.undo{flex:none; align-self:center; margin:0 10px 0 0; padding:4px 9px;
+    font:inherit; font-size:.75rem; color:var(--accent); background:var(--accent-soft);
+    border:none; border-radius:6px; cursor:pointer}
+  button.undo:hover{filter:brightness(.96)}
+  button.undo:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+  .todo{color:var(--urgent)!important; font-style:normal}
+  ul.list input:checked + label .t{text-decoration:line-through; text-decoration-thickness:1.5px}
+  ul.list input:checked + label{opacity:.45}
+
+  details{background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    box-shadow:var(--shadow); overflow:hidden}
+  details ul.list{border:none; border-radius:0; box-shadow:none}
+  summary{padding:12px 16px; cursor:pointer; font-weight:500; font-size:.9rem; list-style:none;
+    display:flex; justify-content:space-between; align-items:center; color:var(--muted)}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+"; font-family:"IBM Plex Mono",monospace; font-size:1.05rem}
+  details[open] summary{border-bottom:1px solid var(--line)}
+  details[open] summary::after{content:"\2212"}
+  summary:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+
+  .note{min-height:96px; padding:13px 15px; border:1px dashed var(--line-2); border-radius:10px;
+    background:var(--sunk); color:var(--ink); font-size:.92rem; line-height:1.6; white-space:pre-wrap}
+  .note:focus{outline:2px solid var(--accent); outline-offset:2px; background:var(--surface)}
+  .note:empty::before{content:attr(data-ph); color:var(--muted)}
+
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    box-shadow:var(--shadow); padding:14px 16px; font-size:.88rem; color:var(--ink-2)}
+  .card b{color:var(--ink)}
+  .card ol,.card ul{margin:8px 0 0; padding-left:20px}
+  .card li{margin:5px 0}
+  .card li::marker{color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:.85em}
+  .card h3{font-family:"IBM Plex Sans",sans-serif; font-size:.82rem; font-weight:600; color:var(--ink);
+    margin:16px 0 0; letter-spacing:.01em}
+  .card h3:first-child{margin-top:0}
+  .card .never{color:var(--urgent)}
+  .card code{font-family:"IBM Plex Mono",monospace; font-size:.85em; background:var(--sunk);
+    padding:1px 5px; border-radius:4px}
+  .bot{font-size:.78rem; color:var(--muted); text-align:center; padding-top:8px; border-top:1px solid var(--line)}
+
+  /* the save bar is the whole point of this page, so it is always in reach */
+  .savebar{position:fixed; left:0; right:0; bottom:0; z-index:20;
+    background:var(--surface); border-top:1px solid var(--line);
+    box-shadow:0 -4px 18px rgba(18,26,30,.07);
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap}
+  .savebar .st{font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--muted);
+    display:flex; align-items:center; gap:7px}
+  .dot{width:8px; height:8px; border-radius:99px; background:var(--line-2); flex:none}
+  .dot.dirty{background:var(--warn)}
+  .dot.saving{background:var(--accent); animation:pulse 1s infinite}
+  .dot.saved{background:var(--done)}
+  .dot.err{background:var(--urgent)}
+  @keyframes pulse{50%{opacity:.3}}
+  button.save{font:inherit; font-size:.86rem; font-weight:600; color:#fff; background:var(--accent);
+    border:none; border-radius:8px; padding:8px 18px; cursor:pointer}
+  button.save:hover{filter:brightness(1.08)}
+  button.save:disabled{background:var(--line-2); cursor:default; filter:none}
+  button.save:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<div class="wrap" id="app-root"></div>
+
+<script id="data" type="application/json">{{DATA}}</script>
+
+<script id="app">
+/* This page rewrites ITSELF. Every save calls artifact.publish() with a complete
+   replacement document rendered from D, so the checked state lives in the published
+   HTML: reading the artifact URL later returns the ticks. Off claude.ai the save
+   button downloads the same document instead. */
+var FONTS = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap";
+
+function esc(s){ return String(s == null ? "" : s)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function daysLeft(iso){
+  var p = iso.split("-"), t = new Date();
+  t.setHours(0,0,0,0);
+  return Math.round((new Date(+p[0], +p[1]-1, +p[2]) - t) / 864e5);
+}
+
+function renderRow(D, i){
+  var r = D.roles[i], on = !!D.done[r.id];
+  var title = esc(r.co + " — " + r.ti);
+  var link = /^https?:/.test(r.url)
+    ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + title + '</a>'
+    : title;
+  var m = [];
+  if (r.dl){
+    var n = daysLeft(r.dl);
+    var lab = r.dl.slice(5).replace("-", "/") + (n < 0 ? " overdue" : " · " + n + "d left");
+    m.push('<span class="dl' + (n >= 0 && n <= 3 ? " hot" : "") + '">' + esc(lab) + "</span>");
+  }
+  if (r.sub) m.push('<span class="sub">applied ' + esc(r.sub) + "</span>");
+  if (r.pri) m.push('<span class="pri p-' + esc(r.pri.toLowerCase()) + '">' + esc(r.pri) + "</span>");
+  if (r.loc) m.push('<span class="loc">' + esc(r.loc) + "</span>");
+  if (/^https?:/.test(r.post || "")) m.push('<a class="via" href="' + esc(r.post) + '" target="_blank" rel="noopener">LinkedIn post</a>');
+  if (r.via) m.push('<span class="via">' + esc(r.via) + "</span>");
+  if (r.why) m.push('<span class="why">' + esc(r.why) + "</span>");
+  if (r.todo) m.push('<span class="why todo">' + esc(r.todo) + "</span>");
+  return '<li><input type="checkbox" id="' + esc(r.id) + '" data-k="' + esc(r.id) + '"'
+    + (on ? " checked" : "") + '><label for="' + esc(r.id) + '">'
+    + '<span class="t">' + link + "</span>"
+    + '<span class="m">' + m.join(" ") + "</span></label>"
+    + '<button class="x" type="button" data-x="' + esc(r.id) + '" '
+    + 'title="Remove this job" aria-label="Remove ' + title + '">&#10005;</button></li>';
+}
+
+/* A removed row: no checkbox, an undo button, and one optional line of why. */
+function renderGone(D, i){
+  var r = D.roles[i];
+  var title = esc(r.co + " — " + r.ti);
+  var link = /^https?:/.test(r.url)
+    ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + title + '</a>'
+    : title;
+  return '<li class="gone">'
+    + '<button class="undo" type="button" data-u="' + esc(r.id) + '">Undo</button>'
+    + '<label><span class="t">' + link + "</span>"
+    + '<input class="rwhy" type="text" data-r="' + esc(r.id) + '" '
+    + 'value="' + esc(D.rwhy[r.id] || "") + '" '
+    + 'placeholder="Why not a fit? (optional; it is written into the pool as the reason)"></label></li>';
+}
+
+function renderBody(D){
+  // removed rows leave the queue entirely: out of the sections, out of the
+  // denominator, into their own folded list at the bottom.
+  var gone = [], live = [], i;
+  for (i = 0; i < D.roles.length; i++){
+    if (D.removed[D.roles[i].id]) gone.push(i); else live.push(i);
+  }
+  var total = live.length, n = 0;
+  for (i = 0; i < live.length; i++) if (D.done[D.roles[live[i]].id]) n++;
+  var out = [];
+  out.push('<header><div class="eyebrow">ApplyPilot</div>'
+    + "<h1>" + esc(D.title) + "</h1>"
+    + '<p class="lede">' + D.lede + "</p>"
+    + '<div class="count"><span>Applied <b>' + n + "</b> / " + total + "</span><span>"
+    + (total - n) + ' left</span></div>'
+    + '<div class="bar"><i style="width:' + (total ? (n / total * 100).toFixed(2) : 0) + '%"></i></div></header>');
+  if (D.card) out.push('<div class="card">' + D.card + "</div>");
+  for (i = 0; i < D.sections.length; i++){
+    var s = D.sections[i];
+    // a prose section carries `body` instead of rows: no checkboxes, nothing to
+    // tick. A section carrying BOTH puts the prose in a card above its rows,
+    // which is how the international list explains its own caveats without
+    // needing a second, disconnected section header.
+    if (s.body && !s.ids){
+      out.push("<section>"
+        + '<div class="eyebrow">' + esc(s.eyebrow) + "</div>"
+        + "<h2>" + esc(s.title) + "</h2>"
+        + (s.fold
+          ? '<details data-d="s' + i + '"><summary>Show</summary><div class="card">' + s.body + "</div></details>"
+          : '<div class="card">' + s.body + "</div>")
+        + "</section>");
+      continue;
+    }
+    if (!s.ids || !s.ids.length) continue;
+    var ids = s.ids.filter(function(k){ return !D.removed[D.roles[k].id]; });
+    if (!ids.length) continue;
+    var rows = ids.map(function(k){ return renderRow(D, k); }).join("");
+    out.push("<section>"
+      + '<div class="eyebrow">' + esc(s.eyebrow) + "</div>"
+      + "<h2>" + esc(s.title) + " (" + ids.length + ")</h2>"
+      + (s.body ? '<div class="card">' + s.body + "</div>" : "")
+      + (s.fold
+        ? '<details data-d="s' + i + '"><summary>Show</summary><ul class="list">' + rows + "</ul></details>"
+        : '<ul class="list">' + rows + "</ul>")
+      + "</section>");
+  }
+
+  if (gone.length){
+    out.push("<section>"
+      + '<div class="eyebrow">Removed by you</div>'
+      + "<h2>Not a fit (" + gone.length + ")</h2>"
+      + '<p style="font-size:.86rem;color:var(--muted)">'
+      + 'These left the queue. Undo puts one back. '
+      + 'A reason you type goes into the pool with the closure on the next sync.</p>'
+      + '<details data-d="gone"><summary>Show</summary><ul class="list">'
+      + gone.map(function(k){ return renderGone(D, k); }).join("")
+      + "</ul></details></section>");
+  }
+  out.push('<section><div class="eyebrow">For your agent</div><h2>Notes</h2>'
+    + '<p style="font-size:.86rem;color:var(--muted)">'
+    + 'Outcomes, priorities to change, directions to drop. '
+    + 'Your agent reads this on the next sync.</p>'
+    + '<div class="note" contenteditable="true" role="textbox" aria-multiline="true" '
+    + 'data-ph="Write here...">' + esc(D.note) + "</div></section>");
+  out.push('<div class="bot">' + esc(D.foot) + "</div>");
+  out.push('<div class="savebar"><span class="st"><i class="dot"></i><span class="msg">'
+    + 'Saved</span></span>'
+    + '<button class="save" type="button" disabled>Save</button></div>');
+  return out.join("\n");
+}
+
+function renderPage(D){
+  var css = document.getElementById("css").textContent;
+  var js = document.getElementById("app").textContent;
+  var json = JSON.stringify(D).replace(/</g, "\\u003c");
+  return '<!doctype html><html><head><meta charset="utf-8">'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1">'
+    + "<title>" + esc(D.title) + "</title>"
+    + '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    + '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+    + '<link rel="stylesheet" href="' + FONTS + '">'
+    + '<style id="css">' + css + "</style></head><body>"
+    + '<div class="wrap" id="app-root">' + renderBody(D) + "</div>"
+    + '<script id="data" type="application/json">' + json + "<\/script>"
+    + '<script id="app">' + js + "<\/script></body></html>";
+}
+
+(function(){
+  var D = JSON.parse(document.getElementById("data").textContent);
+  // tolerate documents published before the remove feature existed
+  if (!D.removed) D.removed = {};
+  if (!D.rwhy) D.rwhy = {};
+  var root = document.getElementById("app-root");
+  if (!root.firstElementChild) root.innerHTML = renderBody(D);
+
+  var dot, msg, btn;
+  var timer = null, busy = false, readonly = false;
+  var lastStatus = ["", "Saved", false];
+
+  // Removing re-renders the whole body, which throws away the savebar and note
+  // nodes. Re-grab them and re-bind every time. The delegated listeners live on
+  // `root`, which survives, so only these three direct ones need rebinding.
+  function bind(){
+    dot = root.querySelector(".dot");
+    msg = root.querySelector(".msg");
+    btn = root.querySelector("button.save");
+    btn.addEventListener("click", save);
+    var note = root.querySelector(".note");
+    if (note) note.addEventListener("input", function(){ D.note = note.innerText; dirty(); });
+    status(lastStatus[0], lastStatus[1], lastStatus[2]);
+  }
+
+  // A fresh <details> is closed, so re-rendering the body used to fold every
+  // list on the page and drop the scroll position: one ✕ on a row found
+  // by scrolling through an open list threw away the reading position. The keys are stable across a render (section index, or "gone"),
+  // so carry the open ones over. Removing a row never changes a section's index,
+  // only its contents, and an emptied section drops out without renumbering the
+  // rest, because the key is the index in D.sections, not in the rendered output.
+  function openKeys(){
+    var out = {}, ds = root.querySelectorAll("details[data-d]"), i;
+    for (i = 0; i < ds.length; i++) if (ds[i].open) out[ds[i].dataset.d] = 1;
+    return out;
+  }
+
+  // SAVING RELOADS THE PAGE. redraw() below keeps the open lists and the scroll
+  // position across a re-render this script controls, but a save is different:
+  // api.publish() hands the viewer a new document and the whole page reloads,
+  // which lands the viewer back at the top with every list folded shut. The rendered
+  // HTML cannot carry that state, because it is per viewer, not part of the board.
+  // So it goes in localStorage, which survives the reload and is private to this
+  // artifact and this browser. Every read and write is wrapped: the accessor
+  // itself throws in a thumbnail capture or with site data blocked, and a board
+  // that cannot restore a scroll position must still render.
+  var UI = "board-ui-v1";
+  function saveUI(){
+    try {
+      localStorage.setItem(UI, JSON.stringify({ open: openKeys(), y: window.scrollY }));
+    } catch (e){}
+  }
+  function restoreUI(){
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(UI) || "null"); } catch (e){}
+    if (!s) return;
+    var ds = root.querySelectorAll("details[data-d]"), i;
+    for (i = 0; i < ds.length; i++) if (s.open && s.open[ds[i].dataset.d]) ds[i].open = true;
+    // after the details are open, so the page has its full height back and the
+    // browser does not clamp the scroll to a shorter document
+    if (typeof s.y === "number") requestAnimationFrame(function(){ window.scrollTo(0, s.y); });
+  }
+  var uiTimer = null;
+  window.addEventListener("scroll", function(){
+    clearTimeout(uiTimer);
+    uiTimer = setTimeout(saveUI, 200);
+  });
+  root.addEventListener("toggle", saveUI, true);   // toggle does not bubble
+
+  function redraw(){
+    var was = openKeys(), y = window.scrollY;
+    root.innerHTML = renderBody(D);
+    var ds = root.querySelectorAll("details[data-d]"), i;
+    for (i = 0; i < ds.length; i++) if (was[ds[i].dataset.d]) ds[i].open = true;
+    bind();
+    // after the open lists are back, so the page is its full height again
+    window.scrollTo(0, y);
+  }
+
+  function status(cls, text, canSave){
+    lastStatus = [cls, text, canSave];
+    if (!dot) return;
+    dot.className = "dot" + (cls ? " " + cls : "");
+    msg.textContent = text;
+    btn.disabled = !canSave;
+  }
+
+  function dirty(){
+    if (readonly) return;
+    status("dirty", "Unsaved", true);
+    clearTimeout(timer);
+    // One minute after the LAST change, so ticking several rows never reloads
+    // the page mid-way. Only on claude.ai; a local file saves on the button.
+    if (window.claude && window.claude.use) timer = setTimeout(save, 60000);
+  }
+
+  async function save(){
+    if (busy || readonly) return;
+    clearTimeout(timer);
+    busy = true;
+    status("saving", "Saving...", false);
+    var api = (window.claude && window.claude.use) ? await window.claude.use("artifact") : null;
+    if (!api){
+      // Not on claude.ai (a local file, or a viewer without write access):
+      // hand over the page as a file instead. Save it over
+      // dashboard/apply_board.html and run `ap.py board sync`.
+      busy = false;
+      download();
+      status("saved", "Downloaded - save it as dashboard/apply_board.html", true);
+      return;
+    }
+    saveUI();   // the publish below reloads the page; this is what comes back
+    try {
+      await api.publish(renderPage(D));
+      status("saved", "Saved", false);
+    } catch (e){
+      var code = (e && e.code) || "upstream_error";
+      if (code === "conflict"){
+        status("saving", "Changed elsewhere, reloading...", false);
+      } else if (code === "not_writer" || code === "not_granted" ||
+                 code === "consent_required" || code === "not_declared" ||
+                 code === "capability_disabled" || code === "capability_removed"){
+        busy = false;
+        download();
+        status("saved", "Read-only here - downloaded a copy instead", true);
+        return;
+      } else if (code === "rate_limited"){
+        status("err", "Too frequent, try again shortly", true);
+      } else {
+        status("err", "Save failed: " + code, true);
+      }
+    } finally { busy = false; }
+  }
+
+  function download(){
+    try {
+      var blob = new Blob([renderPage(D)], {type: "text/html"});
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "apply_board.html";
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e){ status("err", "Download failed", true); }
+  }
+
+  root.addEventListener("change", function(e){
+    var b = e.target;
+    if (!b.dataset || !b.dataset.k) return;
+    if (b.checked) D.done[b.dataset.k] = 1; else delete D.done[b.dataset.k];
+    var total = D.roles.length, n = 0;
+    for (var i = 0; i < total; i++) if (D.done[D.roles[i].id]) n++;
+    var c = root.querySelector(".count b"), f = root.querySelector(".bar > i"),
+        left = root.querySelector(".count span:last-child");
+    if (c) c.textContent = n;
+    if (f) f.style.width = (total ? (n / total * 100) : 0) + "%";
+    if (left) left.textContent = (total - n) + " left";
+    dirty();
+  });
+
+  // remove / undo, both delegated so they survive a redraw
+  root.addEventListener("click", function(e){
+    var t = e.target;
+    if (t.dataset && t.dataset.x){
+      D.removed[t.dataset.x] = 1;
+      delete D.done[t.dataset.x];   // a removed role is not a submitted one
+      redraw(); dirty(); return;
+    }
+    if (t.dataset && t.dataset.u){
+      delete D.removed[t.dataset.u];
+      delete D.rwhy[t.dataset.u];
+      redraw(); dirty(); return;
+    }
+  });
+
+  // the why-line on a removed row
+  root.addEventListener("input", function(e){
+    var t = e.target;
+    if (!t.dataset || !t.dataset.r) return;
+    if (t.value) D.rwhy[t.dataset.r] = t.value; else delete D.rwhy[t.dataset.r];
+    dirty();
+  });
+
+  bind();
+  restoreUI();
+  // leaving the tab is a safe moment to flush: nobody is looking at the page
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "hidden" && btn && !btn.disabled && !readonly && window.claude && window.claude.use) save();
+  });
+  window.addEventListener("beforeunload", function(e){
+    if (btn && !btn.disabled && !readonly){ e.preventDefault(); e.returnValue = ""; }
+  });
+})();
+</script>

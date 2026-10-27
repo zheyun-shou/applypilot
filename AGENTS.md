@@ -12,6 +12,7 @@ This file is for any coding agent that receives the GitHub repo directly. Codex 
 4. For privacy, CAPTCHA, login, and public-sharing boundaries, read `references/safety-and-boundaries.md`.
 5. Use `templates/` to create user-owned files.
 6. Use `examples/fake-demo-example/` to show the user what a finished setup can look like.
+7. To run automated sweeps, screening, the apply board or the form-filling runners, read `pipeline/AGENT_GUIDE.md`.
 
 ## Operating Principles
 

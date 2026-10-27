@@ -148,6 +148,18 @@ For resume tailoring, users should provide an editable source when possible: DOC
 
 Precision mode is a guided workflow, especially for first-time users. The agent should start with review-only or draft changes, create a new tailored version from an editable source, and ask the user to review it before submitting high-value applications. Once the user trusts the output, they can loosen review rules.
 
+## Automated Pipeline
+
+The [`pipeline/`](pipeline/) folder adds scripts for the repetitive part of the work:
+
+- daily sweeps of LinkedIn's public job search, plus Platsbanken for Sweden;
+- rule-based screening that records a reason for every ad it closes;
+- a job pool with a reading pass for the ads that survive;
+- an apply board you can tick, published as a claude.ai Artifact or opened as a local file;
+- optional browser runners that fill LinkedIn Easy Apply and company-site forms from your profile and stop on any question they cannot answer.
+
+The pipeline needs only Python 3.8+. The apply runners also need Node.js and Chrome. Start with [pipeline/README.md](pipeline/README.md). If an agent runs it for you, point the agent at [pipeline/AGENT_GUIDE.md](pipeline/AGENT_GUIDE.md).
+
 ## Tool Capability Matrix
 
 ApplyPilot adapts to the tools available in the user's agent environment.

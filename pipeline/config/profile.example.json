@@ -1,0 +1,100 @@
+{
+  "_about": "Facts about the candidate. The form fillers answer ONLY from this file and stop on any question it does not cover. Everything here is a fictional example: replace every value. Keys starting with _ are comments.",
+
+  "candidate": {
+    "legal_name": "Robin Example",
+    "first_name": "Robin",
+    "last_name": "Example",
+    "preferred_name": "Robin",
+    "pronouns": "",
+    "email": "robin.example@example.com",
+    "phone": "+46700000000",
+    "phone_national": "700000000",
+    "_phone_national": "LinkedIn's phone box takes the number without the country code.",
+    "city": "Stockholm",
+    "country": "Sweden",
+    "current_location": "Stockholm, Sweden",
+    "street_address": "",
+    "postal_code": "",
+    "linkedin_url": "https://www.linkedin.com/in/robin-example",
+    "github_url": "",
+    "portfolio_url": ""
+  },
+
+  "current_status": {
+    "current_job_title": "Data Scientist",
+    "available_start": "2 weeks",
+    "notice_period": "2 weeks"
+  },
+
+  "education": {
+    "_about": "Used for school and degree dropdowns. Values separated by | are tried in order.",
+    "school": "Example University|Other",
+    "degree": "Master's|Master|MSc|Other",
+    "graduation_year": "2025"
+  },
+
+  "work_authorization": {
+    "_about": "Per country. right_to_work: you may work there today. needs_sponsorship: you need the employer to sponsor a visa. The screening closes 'we will not sponsor' ads only where needs_sponsorship is true, and the form fillers answer sponsorship questions from the job's country.",
+    "by_country": {
+      "Sweden": {
+        "right_to_work": true,
+        "needs_sponsorship": false,
+        "describe": "I have the right to work in Sweden and do not need sponsorship."
+      }
+    },
+    "default": {
+      "right_to_work": false,
+      "needs_sponsorship": true,
+      "describe": "I will need visa sponsorship to work in this country."
+    }
+  },
+
+  "compensation": {
+    "_about": "number goes into numeric salary boxes, text into free-text ones. Pick it per country; default covers the rest.",
+    "by_country": {
+      "Sweden": { "number": "40000", "text": "40000 SEK per month" },
+      "Germany": { "number": "50000", "text": "50000 EUR per year" },
+      "United Kingdom": { "number": "38000", "text": "38000 GBP per year" }
+    },
+    "default": { "number": "45000", "text": "45000 EUR per year" }
+  },
+
+  "languages": {
+    "_about": "Answers for language-level dropdowns. Values separated by | are tried in order.",
+    "english": "Professional|Fluent|Verhandlungssicher|Fließend|Beroepsmatig",
+    "others_default": "None|Niet|Keine"
+  },
+
+  "voluntary_self_identification": {
+    "_about": "Default is to decline. Replace with real answers only if you want them filled automatically.",
+    "gender": "Prefer not|Decline",
+    "ethnicity": "Prefer not|Decline",
+    "disability": "Prefer not|Decline|No",
+    "veteran": "Prefer not|Decline|No",
+    "sexual_orientation": "Prefer not|Decline",
+    "age": "Prefer not|Decline"
+  },
+
+  "automation": {
+    "resume_file": "C:/path/to/your/CV.pdf",
+    "_resume_name_check": "A substring of the CV file name. The Easy Apply runner stops if LinkedIn's review page shows a different resume.",
+    "resume_name_check": "CV",
+    "years_for_common_skills": "2",
+    "_common_skills": "Skills you will answer the default years for, and say Yes to in yes/no experience questions.",
+    "common_skills": ["Python", "SQL", "Machine Learning", "Data Analysis", "PyTorch", "pandas", "NumPy", "scikit-learn", "Git", "Docker", "Statistics", "Deep Learning", "Data Science", "Computer Vision", "Time Series"],
+    "_niche_topics": "Yes/no experience questions on these topics stop the runner instead of answering Yes.",
+    "niche_topics": "Kotlin|Swift|Scala|Rust|Golang|Ruby|PHP|C#|\\.NET|Java\\b|JavaScript|TypeScript|React|Angular|iOS|Android|SAP|Salesforce|FPGA|banking|insurance|pharma|clinical|automotive|aerospace|defen[cs]e|people management|managing a team",
+    "tick_future_roles": true,
+    "tick_marketing": false,
+    "answer_criminal_record": "No",
+    "_extra_answers": "Your own [question regex, answer] pairs. They are checked FIRST, so they win over every built-in rule. Keep answers you would give on any form; anything job-specific belongs in the job's own entry.",
+    "extra_answers": [
+      ["how did you hear", "LinkedIn"],
+      ["willing to relocate|relocat", "Yes"],
+      ["travel", "Yes"],
+      ["hybrid|on-?site|office", "Yes"],
+      ["background check", "Yes"]
+    ]
+  }
+}

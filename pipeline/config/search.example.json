@@ -1,0 +1,56 @@
+{
+  "_about": "What to search and where. Keys starting with _ are comments. Each region is swept separately: `python pipeline/ap.py sweep --region <name>`.",
+
+  "keywords": [
+    "machine learning", "data engineer", "data scientist", "data analyst",
+    "AI engineer", "applied scientist", "analytics engineer", "mlops", "deep learning",
+    "computer vision", "signal processing", "time series",
+    "business analyst", "graduate programme", "trainee",
+    "software engineer"
+  ],
+  "_keywords": "Breadth is cheap: each keyword costs 1-10 page fetches per location. LinkedIn ignores quotes, so very generic words (\"engineer\") fill the 100-result cap with noise. Watch the sweep log: a keyword at or below the noise floor returned padding, not matches. Swedish/German/Dutch keywords are worth adding: an ad has to be seen before it can be screened.",
+
+  "regions": [
+    {
+      "name": "sweden",
+      "country": "Sweden",
+      "_country": "Must match a key in profile.json work_authorization.by_country to use that entry; otherwise the default entry applies.",
+      "locations": ["Sweden"],
+      "sources": ["linkedin", "platsbanken"],
+      "extra_keywords": ["dataingenjör", "AI-utvecklare", "mjukvaruutvecklare"]
+    },
+    {
+      "name": "netherlands",
+      "country": "Netherlands",
+      "locations": ["Netherlands"],
+      "sources": ["linkedin"]
+    },
+    {
+      "name": "germany",
+      "country": "Germany",
+      "_locations": "A large country is better swept city by city: each location gets its own 100-result cap.",
+      "locations": ["Berlin, Germany", "Munich, Germany", "Hamburg, Germany"],
+      "sources": ["linkedin"],
+      "close_low_priority": true
+    },
+    {
+      "name": "uk",
+      "country": "United Kingdom",
+      "locations": ["London, England, United Kingdom"],
+      "sources": ["linkedin"],
+      "_uk_sponsor_register": "Checks each employer against the Home Office register of licensed sponsors (download it first; see pipeline/README.md). Only useful if you need a Skilled Worker visa.",
+      "uk_sponsor_register": true,
+      "close_low_priority": true
+    }
+  ],
+
+  "_close_low_priority": "When true, a survivor whose provisional priority is Low is closed at ingest, unless it is LinkedIn Easy Apply. Useful where you need sponsorship and most ads say nothing about it.",
+
+  "window": {
+    "_about": "Hours to look back. The sweep widens the window by itself to cover the gap since the last successful run of that region, up to max_hours.",
+    "default_hours": 24,
+    "max_hours": 168
+  },
+
+  "pause_seconds": 1.0
+}
